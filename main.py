@@ -41,6 +41,12 @@ class Game:
 
         self.my_font = font.Font(size=20)
 
+        self.event_txt = [["横の人が爆発した.", 5, 5]] # with open
+        self.event_rand = 0.03 # イベントを起こす確率
+        self.event_list = [[i[0], i[1] * 0.1, i[2] * 0.1] for i in self.event_txt]
+        self.event_up = 0
+        self.event_down = 0
+        
         # self.canvas_frame = tk.Frame(master)
         # self.canvas_frame.pack()
         # キャンパス
@@ -75,7 +81,7 @@ class Game:
         self.button.pack(side=tk.LEFT, expand=True, fill=tk.X)
 
         self.draw_chart()
-
+        
 
     def buy(self):
         amt = self.get_amount()
@@ -140,9 +146,30 @@ class Game:
         self.canvas.draw()
         self.canvas.get_tk_widget().pack()
 
+    def event(self, name, up, down):
+        messagebox.showinfo("イベント発生!", f"\n{name}")
+
+        # up, down の幅を変更
+        self.event_up += up
+        self.event_down += down
+
+        return 
+
     def simulate_day(self):
         # ここに確率をつける予定 -> ここにつけると売買の終了後乱数を生成しするため1000回は下がる ->> これで良いかを確認
         prices = [self.price]
+        event_bool = True if self.event_rand > random.random() else False
+        event_bool = True
+        if event_bool:
+            event_idx = random.randint(0, len(self.event_list)-1)
+            # ここでイベントを起こす
+            name = self.event_list[event_idx][0]
+            up = self.event_list[event_idx][1]
+            down = self.event_list[event_idx][2]
+            self.event(name, up, down)
+
+        # ここでup, down を基本の値に収束する
+
         for _ in range(1000):
             change = random.randint(self.lower_width, self.up_width)
             prices.append(max(prices[-1] + change, 1))
