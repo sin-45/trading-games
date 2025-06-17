@@ -41,9 +41,9 @@ class Game:
 
         self.my_font = font.Font(size=20)
 
-        self.event_txt = [["横の人が爆発した.", 5, 5]] # with open
+        self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
         self.event_rand = 0.03 # イベントを起こす確率
-        self.event_list = [[i[0], i[1] * 0.1, i[2] * 0.1] for i in self.event_txt]
+        self.event_list = [[i[0], int(i[2]) * 0.1 * self.rev, int(i[3]) * 0.1 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
         
