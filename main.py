@@ -159,7 +159,6 @@ class Game:
         # ここに確率をつける予定 -> ここにつけると売買の終了後乱数を生成しするため1000回は下がる ->> これで良いかを確認
         prices = [self.price]
         event_bool = True if self.event_rand > random.random() else False
-        event_bool = True
         if event_bool:
             event_idx = random.randint(0, len(self.event_list)-1)
             # ここでイベントを起こす
