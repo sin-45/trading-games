@@ -43,10 +43,9 @@ class Game:
 
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
         self.event_rand = 0.03 # イベントを起こす確率
-        self.event_list = [[i[0], int(i[2]) * 0.1 * self.rev, int(i[3]) * 0.1 * self.rev] for i in self.event_txt]
+        self.event_list = [[i[0], int(i[2]) / 10 * self.rev, int(i[3]) / 10 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
-        
         # self.canvas_frame = tk.Frame(master)
         # self.canvas_frame.pack()
         # キャンパス
@@ -147,7 +146,7 @@ class Game:
         self.canvas.get_tk_widget().pack()
 
     def event(self, name, up, down):
-        messagebox.showinfo("イベント発生!", f"\n{name}")
+        messagebox.showinfo("イベント発生!", f"\n{name} \n{up, down}")
 
         # up, down の幅を変更
         self.event_up += up
