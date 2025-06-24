@@ -178,6 +178,8 @@ class Game:
 
         # ここでup, down を基本の値に収束する
         self.lower, self.up = self.conve(self.lower, self.up)
+
+        # 浮動小数点だとrand関数が生成できないため整数にするためにself.tenで10^n乗する
         inp_lower, inp_up = round((self.lower + self.lower_width) * self.ten), round((self.up + self.up_width) * self.ten)
         print(f"{inp_lower * 10 / self.ten }, {inp_up * 10 / self.ten}", f"{inp_lower} {inp_up}")
 
@@ -185,6 +187,7 @@ class Game:
             change = random.randint(inp_lower, inp_up)
             prices.append(max(prices[-1] + change, 1))
         
+        # 浮動小数点でできない為,self.tenで10^nで割らないといけないためここで割る
         for i in range(len(prices)):
             prices[i] //= self.ten
 
@@ -247,20 +250,3 @@ if __name__ == "__main__":
     game = Game(root)
     root.mainloop()
 
-# 思っていることリスト
-# スクロールバーいる？　-> 使う機械がない => ok
-# ↑戻す必要すらない気がする => ok
-# 買った値段がわかればいいかも -> 実装はちょっとめんどそうだけど技術的には可能 => ok
-# ↑売った時にどれを売るかがわからないため．そこが問題になってくる気がする => ok
-# 前から売っていくなら平均とかも出せる -> 問題は↑と同じ => ok
-# そのほかになんかいいアイデアがあれば実装する -> 多分出てこない気がする and 出てきたとしたらめんどくさい
-
-
-# 実装しないといけないことリスト
-# csvかなんかのファイルに格納されたイベントを引き出す部分
-# イベントの発生を知らせる関数 -> イベントを起こすように変更する
-# upもdownの幅を決めてそこから乱数で決めることで固定化を解消
-# 徐々にもどうしていくように変更 -> ここも幅を決めて乱数にするのもあり
-# 振れ幅を乱数で決めて収束幅も乱数で決める -> その乱数の幅をイベントのファイルに書き込み読み込んぬ時にlistで管理して上手いことやる
-# イベントはメッセージボックスとかのほうが良い気がする．確率をかなり小さくし，1000回の乱数の途中で入れることによりバランスを調整 -> 乱数生成前でも良い気もする
-# 間に入れることにより，いいときに売買するのを防ぐ -> イメージとして30 ~ 60日に一回くらい起きてもいいかも
