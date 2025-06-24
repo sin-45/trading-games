@@ -22,7 +22,7 @@ class Game:
         elif self.total_days >= 365: self.total_days = 365
         elif self.total_days < 10: self.total_days = 10
 
-        self.ohcl = [] # [(day, start, heigh, lower, end)]
+        self.ohcl = [] # [(day, start, heigh, lower, end)] -> 毎日の変化を格納
         self.day = 0 # 日数
         self.price = 10_000 # 株価
         self.start_money = 1_000_000
@@ -36,13 +36,15 @@ class Game:
 
         # 乱数一回あたりの変動幅
         self.rev = 1
-        self.up_width = 10 * self.rev # up
-        self.lower_width = -10 * self.rev # down
+        self.up_width = 10 * self.rev # up の初期値
+        self.lower_width = -10 * self.rev # down の初期値
+        self.up, self.lower = 0, 0 # 変化させる変数
+        self.ten = 10 ** 6
 
         self.my_font = font.Font(size=20)
 
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
-        self.event_rand = 0.03 # イベントを起こす確率
+        self.event_rand = 0.15 # イベントを起こす確率
         self.event_list = [[i[0], int(i[2]) / 10 * self.rev, int(i[3]) / 10 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
@@ -145,18 +147,26 @@ class Game:
         self.canvas.draw()
         self.canvas.get_tk_widget().pack()
 
+    # event関数
     def event(self, name, up, down):
-        messagebox.showinfo("イベント発生!", f"\n{name} \n{up, down}")
+        messagebox.showinfo("イベント発生!", f"\n{name}") # \n{up, down}")
 
         # up, down の幅を変更
-        self.event_up += up
-        self.event_down += down
+        self.up += up
+        self.lower -= down
+        # print("->", up, down)
 
-        return 
+
+    # 収束関数
+    def conve(self, lower, up):
+        lower /= 1.75
+        up /= 2
+        return lower, up
+    
 
     def simulate_day(self):
         # ここに確率をつける予定 -> ここにつけると売買の終了後乱数を生成しするため1000回は下がる ->> これで良いかを確認
-        prices = [self.price]
+        prices = [self.price * self.ten]
         event_bool = True if self.event_rand > random.random() else False
         if event_bool:
             event_idx = random.randint(0, len(self.event_list)-1)
@@ -167,10 +177,16 @@ class Game:
             self.event(name, up, down)
 
         # ここでup, down を基本の値に収束する
+        self.lower, self.up = self.conve(self.lower, self.up)
+        inp_lower, inp_up = round((self.lower + self.lower_width) * self.ten), round((self.up + self.up_width) * self.ten)
+        print(f"{inp_lower * 10 / self.ten }, {inp_up * 10 / self.ten}", f"{inp_lower} {inp_up}")
 
         for _ in range(1000):
-            change = random.randint(self.lower_width, self.up_width)
+            change = random.randint(inp_lower, inp_up)
             prices.append(max(prices[-1] + change, 1))
+        
+        for i in range(len(prices)):
+            prices[i] //= self.ten
 
         start = prices[0]
         heigh = max(prices)
