@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from math import*
 import tkinter.font as font
-plt.rcParams['font.family'] = 'MS Gothic'
+plt.rcParams['font.family'] = ['MS Gothic', 'Hiragino Sans']
 
 class Game:
     def __init__(self, master):
