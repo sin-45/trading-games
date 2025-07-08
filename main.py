@@ -1,5 +1,6 @@
+import sys
 import tkinter as tk
-from tkinter import ttk, simpledialog, messagebox
+from tkinter import ttk, messagebox
 import random
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -39,12 +40,12 @@ class Game:
         self.up_width = 10 * self.rev # up の初期値
         self.lower_width = -10 * self.rev # down の初期値
         self.up, self.lower = 0, 0 # 変化させる変数
-        self.ten = 10 ** 6
+        self.ten = 10
 
         self.my_font = font.Font(size=20)
 
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
-        self.event_rand = 0.15 # イベントを起こす確率
+        self.event_rand = 0.05 # イベントを起こす確率
         self.event_list = [[i[0], int(i[2]) / 10 * self.rev, int(i[3]) / 10 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
@@ -156,7 +157,6 @@ class Game:
         self.lower -= down
         # print("->", up, down)
 
-
     # 収束関数
     def conve(self, lower, up):
         lower /= 1.75
@@ -176,17 +176,18 @@ class Game:
             down = self.event_list[event_idx][2]
             self.event(name, up, down)
 
-        # ここでup, down を基本の値に収束する
-        self.lower, self.up = self.conve(self.lower, self.up)
-
         # 浮動小数点だとrand関数が生成できないため整数にするためにself.tenで10^n乗する
-        inp_lower, inp_up = round((self.lower + self.lower_width) * self.ten), round((self.up + self.up_width) * self.ten)
-        print(f"{inp_lower * 10 / self.ten }, {inp_up * 10 / self.ten}", f"{inp_lower} {inp_up}")
+        inp_lower, inp_up = round((self.lower) * self.ten), round((self.up) * self.ten)
+        print(f"{inp_lower} {inp_up}")
 
+        # 乱数を生成
         for _ in range(1000):
             change = random.randint(inp_lower, inp_up)
             prices.append(max(prices[-1] + change, 1))
         
+        self.lower = self.lower_width
+        self.up = self.up_width
+        print(f"lower: {self.lower}, up: {self.up}")
         # 浮動小数点でできない為,self.tenで10^nで割らないといけないためここで割る
         for i in range(len(prices)):
             prices[i] //= self.ten
