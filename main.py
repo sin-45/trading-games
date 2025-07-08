@@ -46,7 +46,8 @@ class Game:
         self.lower_width = -10 * self.rev # down の初期値
         self.up, self.lower = 0, 0 # 変化させる変数
         self.ten = 10
-
+        self.up_bias = 1 # 乱数時に上昇させる幅(%) -> 常に成長しているところを再現
+        self.up_rand_bias = 0.2 # 上昇幅の乱数の幅
         self.my_font = font.Font(size=20)
 
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
@@ -54,6 +55,9 @@ class Game:
         self.event_list = [[i[0], int(i[1]) / 10 * self.rev, int(i[2]) / 10 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
+
+        u, d = sum([int(self.event_txt[i][1]) for i in range(len(self.event_txt))]), sum([int(self.event_txt[i][2]) for i in range(len(self.event_txt))])
+        print(u, d)
         # self.canvas_frame = tk.Frame(master)
         # self.canvas_frame.pack()
         # キャンパス
@@ -183,6 +187,10 @@ class Game:
 
         # 浮動小数点だとrand関数が生成できないため整数にするためにself.tenで10^n乗する
         inp_lower, inp_up = round((self.lower) * self.ten), round((self.up) * self.ten)
+        
+        # 乱数の幅を上昇させる
+        if random.random() < self.up_rand_bias: inp_up += self.up_bias
+        
         print(f"{inp_lower} {inp_up}")
 
         # 乱数を生成
