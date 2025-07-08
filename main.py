@@ -3,10 +3,15 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import random
 import matplotlib.pyplot as plt
+import matplotlib.font_manager as fm
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from math import*
 import tkinter.font as font
-plt.rcParams['font.family'] = ['MS Gothic', 'Hiragino Sans']
+
+all_font = [f.name for f in fm.fontManager.ttflist]
+if "MS Gothic" in all_font: plt.rcParams['font.family'] = 'MS Gothic'
+else: plt.rcParams['font.family'] = 'Hiragino Sans'
+
 
 class Game:
     def __init__(self, master):
@@ -46,7 +51,7 @@ class Game:
 
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
         self.event_rand = 0.05 # イベントを起こす確率
-        self.event_list = [[i[0], int(i[2]) / 10 * self.rev, int(i[3]) / 10 * self.rev] for i in self.event_txt]
+        self.event_list = [[i[0], int(i[1]) / 10 * self.rev, int(i[2]) / 10 * self.rev] for i in self.event_txt]
         self.event_up = 0
         self.event_down = 0
         # self.canvas_frame = tk.Frame(master)
