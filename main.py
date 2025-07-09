@@ -28,6 +28,7 @@ class Game:
         elif self.total_days >= 365: self.total_days = 365
         elif self.total_days < 10: self.total_days = 10
 
+        # 初期設定
         self.ohcl = [] # [(day, start, heigh, lower, end)] -> 毎日の変化を格納
         self.day = 0 # 日数
         self.price = 10_000 # 株価
@@ -38,7 +39,7 @@ class Game:
         self.coefficient = 3.0
         self.daily_changes = []
         self.colors = []  # 色指定リスト
-        self.SCROLL = True # スクロールバーを出すかどうか
+        self.SCROLL = False # スクロールバーを出すかどうか
 
         # 乱数一回あたりの変動幅
         self.rev = 1
@@ -50,6 +51,7 @@ class Game:
         self.up_rand_bias = 0.2 # 上昇幅の乱数の幅
         self.my_font = font.Font(size=20)
 
+        # イベント情報をcsvから格納
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
         self.event_rand = 0.05 # イベントを起こす確率
         self.event_list = [[i[0], int(i[1]) / 10 * self.rev, int(i[2]) / 10 * self.rev] for i in self.event_txt]
@@ -128,8 +130,8 @@ class Game:
             else: mark = "-"
             messagebox.showinfo("ゲーム終了", 
                 f"{self.total_days}日経過しました！ \n初期資産: {self.start_money:,}円 \n最終資産: {final:,}円 \n収支: {mark}{abs(final - self.start_money):,} ( {mark}{abs(round((final - self.start_money) / self.start_money * 100, 2)):,}%)")
-            self.master.destroy()
-            exit()
+            # self.master.destroy()
+            sys.exit()
 
         self.day += 1
         self.coefficient = 5 if random.random() < 0.05 else 1  # イベント発生率5%
