@@ -190,9 +190,9 @@ class Game:
         # 浮動小数点だとrand関数が生成できないため整数にするためにself.tenで10^n乗する
         inp_lower, inp_up = round((self.lower) * self.ten), round((self.up) * self.ten)
         
-        # 乱数の幅を上昇させる
-        if random.random() < self.up_rand_bias: inp_up += self.up_bias
-        
+        # 乱数の幅を上昇させる & 下がっているときにあがるように調整
+        if random.random() - min(1 - self.price / 10000, 0) < self.up_rand_bias: inp_up += self.up_bias
+        print(1 - self.price / 10000)
         print(f"{inp_lower} {inp_up}")
 
         # 乱数を生成
