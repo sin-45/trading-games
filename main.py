@@ -55,8 +55,11 @@ class Game:
         self.event_txt = [line.rstrip("\n").split(",") for line in open("event_list.csv", encoding="utf-8")]
         self.event_rand = 0.05 # イベントを起こす確率
         self.event_list = [[i[0], int(i[1]) / 10 * self.rev, int(i[2]) / 10 * self.rev] for i in self.event_txt]
-        self.event_up = 0
-        self.event_down = 0
+ 
+        # 経済成長のバイアスリスト
+        self.price_indices = [[0.03, (10, 30), (1, 7)], [0.015, (-10, -30), (1, 7)]] # 発生確率, 経済成長率をアップ（min, max）, 日にち（min, max）
+        self.price_indices_up_bias, self.price_indices_down_bias = 0, 0
+        self.price_indices_up_day, self.price_indices_down_day = 0, 0
 
         u, d = sum([int(self.event_txt[i][1]) for i in range(len(self.event_txt))]), sum([int(self.event_txt[i][2]) for i in range(len(self.event_txt))])
         print(u, d)
@@ -191,8 +194,37 @@ class Game:
         inp_lower, inp_up = round((self.lower) * self.ten), round((self.up) * self.ten)
         
         # 乱数の幅を上昇させる & 下がっているときにあがるように調整
-        if random.random() - min(1 - self.price / 10000, 0) < self.up_rand_bias: inp_up += self.up_bias
-        print(1 - self.price / 10000)
+        # self.price_indices = [[0.03, (10, 30), (1, 7)], [0.015, (-10, -30), (1, 7)]] # 発生確率, 経済成長率をアップ（min, max）, 日にち（min, max）
+        if random.random() < self.price_indices[0][0]:
+            bias1 = self.price_indices[0][1]
+            bias_prcent = random.randint(bias1[0], bias1[1])
+            self.price_indices_up_bias = bias_prcent
+
+            bias2 = self.price_indices[0][2]
+            bias_day = random.randint(bias2[0], bias2[1])
+            self.price_indices_up_day += bias_day
+
+        if random.random() < self.price_indices[1][0]:
+            bias1 = self.price_indices[1][1]
+            bias_prcent = random.randint(bias1[1], bias1[0])
+            self.price_indices_down_bias = bias_prcent
+
+            bias2 = self.price_indices[1][2]
+            bias_day = random.randint(bias2[0], bias2[1])
+            self.price_indices_down_day += bias_day
+ 
+        total_bias = 0
+        if self.price_indices_up_day > 0:
+            self.price_indices_up_day -= 1
+            total_bias += self.price_indices_up_bias
+        
+        if self.price_indices_down_day > 0:
+            self.price_indices_down_day -= 1
+            total_bias -= self.price_indices_down_bias
+
+        if random.random() - min(1 - self.price / 10000, 0) - (total_bias / 100) < self.up_rand_bias:
+            inp_up += self.up_bias
+
         print(f"{inp_lower} {inp_up}")
 
         # 乱数を生成
