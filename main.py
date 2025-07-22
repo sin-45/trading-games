@@ -145,16 +145,17 @@ class Game:
         )
 
         # 箱ひげ図のカスタムカラー描画
-        for i, data in enumerate(self.daily_changes):
-            box = self.ax.boxplot(data, positions=[i], widths=0.6, patch_artist=True, showmeans=True)
-            for patch in box['boxes']:
-                patch.set_facecolor(self.colors[i])
+        # print(self.daily_changes)
+        # for i, data in enumerate(self.daily_changes):
+        #     box = self.ax.boxplot(data, positions=[i], widths=0.6, patch_artist=True, showmeans=True)
+        #     for patch in box['boxes']:
+        #         patch.set_facecolor(self.colors[i])
 
         self.ax.set_title("日別の株価変動（箱ひげ図）", fontsize=12)
         self.ax.set_xlabel("日数")
         self.ax.set_ylabel("株価")
         self.ax.set_xticks(range(len(self.daily_changes)))
-        self.ax.set_xticklabels([f"{i+1}" for i in range(len(self.daily_changes))])
+        self.ax.set_xticklabels([])
 
         # canvas = FigureCanvasTkAgg(self.fig, master=self.canvas_frame)
         self.canvas.draw()
@@ -224,7 +225,7 @@ class Game:
             inp_up += self.up_bias
 
         print(f"{inp_lower} {inp_up}")
-
+        a = self.daily_changes
         # 乱数を生成
         for _ in range(1000):
             change = random.randint(inp_lower, inp_up)
