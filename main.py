@@ -8,6 +8,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 # from math import*
 import tkinter.font as font
 
+# フォントの指定 : Win -> MS Gothic, other -> Hiragino Sans
 all_font = [f.name for f in fm.fontManager.ttflist]
 if "MS Gothic" in all_font: plt.rcParams['font.family'] = 'MS Gothic'
 else: plt.rcParams['font.family'] = 'Hiragino Sans'
@@ -39,7 +40,7 @@ class Game:
         self.coefficient = 3.0
         self.daily_changes = []
         self.colors = []  # 色指定リスト
-        self.SCROLL = False # スクロールバーを出すかどうか
+
 
         # 乱数一回あたりの変動幅
         self.rev = 1
@@ -63,8 +64,7 @@ class Game:
 
         u, d = sum([int(self.event_txt[i][1]) for i in range(len(self.event_txt))]), sum([int(self.event_txt[i][2]) for i in range(len(self.event_txt))])
         print(u, d)
-        # self.canvas_frame = tk.Frame(master)
-        # self.canvas_frame.pack()
+
         # キャンパス
         self.fig, self.ax = plt.subplots(figsize=(10, 4))
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.master)
@@ -78,10 +78,6 @@ class Game:
         self.label = tk.Label(self.master, font=("Meiryo", 14))
         self.label.pack()
 
-        if self.SCROLL:
-            # スクロールバー
-            self.scroll = ttk.Scale(self.master, from_=0, to=0, orient="horizontal", command=self.on_scroll)
-            self.scroll.pack(fill="x", padx=20)
 
         # 売買
         # 買うボタン
@@ -132,8 +128,10 @@ class Game:
             elif final == self.start_money: mark = "±"
             else: mark = "-"
             messagebox.showinfo("ゲーム終了", 
-                f"{self.total_days}日経過しました！ \n初期資産: {self.start_money:,}円 \n最終資産: {final:,}円 \n収支: {mark}{abs(final - self.start_money):,} ( {mark}{abs(round((final - self.start_money) / self.start_money * 100, 2)):,}%)")
-            # self.master.destroy()
+                f"{self.total_days}日経過しました！ \
+                    \n初期資産: {self.start_money:,}円 \
+                    \n最終資産: {final:,}円 \
+                    \n収支: {mark}{abs(final - self.start_money):,} ( {mark}{abs(round((final - self.start_money) / self.start_money * 100, 2)):,}%)")
             sys.exit()
 
         self.day += 1
@@ -253,17 +251,8 @@ class Game:
         else:
             self.view_start = 0
 
-        if self.SCROLL:
-            max_scroll = max(0, self.day - 30)
-            self.scroll.config(to = max_scroll)
-            self.scroll.set(self.view_start)
-
         self.draw_chart()
 
-
-    def on_scroll(self, val):
-        self.view_start = int(float(val))
-        self.draw_chart()
 
     def get_amount(self):
         try:
@@ -279,7 +268,7 @@ class Game:
 
         view_data = self.ohcl[self.view_start:self.view_start + 30]
 
-        for i, (day, start, heigh, lower, end) in enumerate(view_data):
+        for _, (day, start, heigh, lower, end) in enumerate(view_data):
             color = "red" if end >= start else "green"
             x = day
             widgh = 0.6
